@@ -1,0 +1,47 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.smartmeal.app'
+    compileSdk 36
+
+    defaultConfig {
+        buildConfigField 'String', 'AI_BASE_URL', '"https://smart-eating-delta.vercel.app"'
+        applicationId 'com.smartmeal.app'
+        minSdk 24
+        targetSdk 36
+        versionCode 110
+        versionName '1.1.0'
+    }
+
+    buildFeatures { buildConfig true }
+
+    signingConfigs {
+        release {
+            def ks = System.getenv('SMARTMEAL_KEYSTORE_PATH')
+            if (ks && file(ks).exists()) {
+                storeFile file(ks)
+                storePassword System.getenv('SMARTMEAL_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('SMARTMEAL_KEY_ALIAS')
+                keyPassword System.getenv('SMARTMEAL_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        debug { applicationIdSuffix '.debug' }
+        release {
+            if (System.getenv('SMARTMEAL_KEYSTORE_PATH') && file(System.getenv('SMARTMEAL_KEYSTORE_PATH')).exists()) {
+                signingConfig signingConfigs.release
+            }
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packaging { resources { excludes += ['/META-INF/{AL2.0,LGPL2.1}'] } }
+}
+
+dependencies {
+    implementation 'com.android.billingclient:billing:9.1.0'
+}
